@@ -327,10 +327,17 @@ function buildwf()
     echo "  Configuring..."
     cmake -DCMAKE_INSTALL_PREFIX="$PREFIX" $CMAKE_FLAGS "$SOURCE/$1" > "$LOGDIR/$PRJNAME/$CONFIGLOG"
     
-    echo "  Building..."
-    make $MAKE_FLAGS > "$LOGDIR/$PRJNAME/$MAKELOG"
-    echo "  Installing..."
-    make install > "$LOGDIR/$PRJNAME/$INSTALLLOG"
+    if  [[ $OSTYPE == *darwin* ]] ; then
+      echo "  Building..."
+      xcodebuild -configuration RelWithDebInfo > "$LOGDIR/$PRJNAME/$MAKELOG"
+      echo "  Installing..."
+      xcodebuild -configuration RelWithDebInfo -target install > "$LOGDIR/$PRJNAME/$INSTALLLOG"
+    else
+      echo "  Building..."
+      make $MAKE_FLAGS > "$LOGDIR/$PRJNAME/$MAKELOG"
+      echo "  Installing..."
+      make install > "$LOGDIR/$PRJNAME/$INSTALLLOG"
+    fi
     
     # Sometimes libtool installs some of our libs as relative, but with absolute path.
     # If a path in *.la file starts with =, then it is relative. Make them absolute.
